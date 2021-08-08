@@ -1,0 +1,5 @@
+{
+  "env":{
+    "MONGO_ATLAS_PW":"ZyBWVsLkki1MtFKG",
+    "JWT_KEY":"yada-yada-hi-dharmasya"}
+}
