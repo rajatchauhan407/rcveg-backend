@@ -1,0 +1,10 @@
+{
+  "env":{
+    "AWS_ACCESS_KEY_ID":"AKIAVKWRJCREDQJJVSQN",
+    "AWS_SECRET_ACCESS_KEY" : "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",
+    "MONGO_ATLAS_PW":"ZyBWVsLkki1MtFKG",
+    "JWT_KEY":"yada-yada-hi-dharmasya",
+    "AuthId" : "ACf80221260dd9ab17e8d3b8714fc49e2e",
+    "AuthKey":"baf27b224dd82a2485531c3ed509324b"
+  }
+}

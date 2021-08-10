@@ -3,7 +3,6 @@ const router = express.Router();
 const vegController= require('../controllers/vegPrices');
 const checkAuth = require('../middleware/auth-check');
 
-
 router.get("/check",vegController.check);
 router.post("/prices",vegController.prices);
 

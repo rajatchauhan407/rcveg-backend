@@ -12,6 +12,7 @@ exports.adminAuthentication = (req, res, next) => {
     //   password:"e4b3cd7df927ee037044b83c097bd3573e7b4db1dcb39813da4f964e01d9581e"
     // });
     // admin.save();
+    
       const email = req.body.email;
       const password = req.body.password;
        console.log(req.res.locals.userId);
@@ -50,14 +51,15 @@ exports.adminAuthentication = (req, res, next) => {
   };
   /*************Add Vegetables ***********/
  exports.addVeggies = (req , res , next) =>{
-   const url = req.protocol + "://" + req.get("host");
+   const url = req.file.location;
+   console.log(url);
    const vegetable = req.body.vegetable;
    const price = req.body.price;
    const vege = new Vege({
     vegName       : req.body.vegetable,
     price         : req.body.price,
     availability  : true,
-    imagePath     : url + "/images/" + req.file.filename 
+    imagePath     : url
    });
    vege.save().then(result =>{
      console.log(result);
