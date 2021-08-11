@@ -69,7 +69,7 @@ router.post("/addVeggies",upload.single("image"),adminController.addVeggies);
 
 router.get("/getSingleVeg", adminController.getSingleVeg);
 
-router.post("/updatePrices",multer({storage : storage}).single("image"), adminController.updatePrices);
+router.post("/updatePrices",upload.single("image"), adminController.updatePrices);
 
 router.post("/delete-bucket",adminController.deleteBucket);
 
