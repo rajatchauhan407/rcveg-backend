@@ -1,24 +1,26 @@
+var aws = require('aws-sdk');
 const express = require('express');
-const multer = require('multer');
+var multer = require('multer');
+var multerS3 = require('multer-s3');
 const router = express.Router();
 const userController = require('../controllers/user');
 const adminController = require('../controllers/admin');
 const vegController= require('../controllers/vegPrices');
 const adminCheck = require('../middleware/adminAuthCheck');
-const AWS = require('aws-sdk');
-const multerS3 = require('multer-s3');
+
+
 const dotenv = require('dotenv');
 dotenv.config();
 // console.log(process.env.AuthId)
 // Configuring AWS
 // AWS.config.loadFromPath('./nodemon.json');
-AWS.config.update({
+aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region:'ap-south-1'
 });
 // console.log(process.env.AWS_ACCESS_KEY_ID);
-const s3 = new AWS.S3();
+const s3 = new aws.S3();
 /********* Configuring Multer ******/
 const MIME_TYPE_MAP ={
   'image/jpeg':'jpg',
@@ -39,9 +41,6 @@ const upload = multer({
     },
       acl:'public-read',
       ContentType: multerS3.AUTO_CONTENT_TYPE,
-      metadata: function (req, file, cb) {
-        cb(null, {fieldName: file.fieldname});
-      },
       key: function (req, file, cb) {
         const name = file.originalname.toLowerCase().slice(5);
         const ext = MIME_TYPE_MAP[file.mimetype];
@@ -70,7 +69,7 @@ router.post("/addVeggies",upload.single("image"),adminController.addVeggies);
 
 router.get("/getSingleVeg", adminController.getSingleVeg);
 
-// router.post("/updatePrices",multer({storage : storage}).single("image"), adminController.updatePrices);
+router.post("/updatePrices",multer({storage : storage}).single("image"), adminController.updatePrices);
 
 router.post("/delete-bucket",adminController.deleteBucket);
 

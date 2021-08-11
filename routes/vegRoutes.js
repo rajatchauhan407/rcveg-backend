@@ -6,7 +6,7 @@ const checkAuth = require('../middleware/auth-check');
 router.get("/check",vegController.check);
 router.post("/prices",vegController.prices);
 
-router.get("/prices",vegController.getPrices);
+router.get("/prices",checkAuth,vegController.getPrices);
 
 router.post("/bucket",vegController.addVegBucket);
 
