@@ -4,7 +4,7 @@ const vegController= require('../controllers/vegPrices');
 const checkAuth = require('../middleware/auth-check');
 
 router.get("/check",vegController.check);
-router.post("/prices",vegController.prices);
+// router.post("/prices",vegController.prices);
 
 router.get("/prices",checkAuth,vegController.getPrices);
 

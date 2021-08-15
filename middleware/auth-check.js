@@ -3,22 +3,28 @@ const User = require('../models/user');
 module.exports= (req,res,next)=>{
    
     try{
+        if(req.headers.authorization){
         const token= req.headers.authorization.split(" ")[1];
         const decodedToken = jwt.verify(token,process.env.JWT_KEY);
-        //  console.log(decodedToken);
+        console.log(decodedToken);
         const contactNo = decodedToken.contact;
-        User.find({
-            'phoneNo' : contactNo
+        User.findOne({
+            phoneNo : contactNo
         }).then((result) => {
-          res.locals.userId = result[0]._id.toString();
-          console.log(res.locals.userId + "hello");
+        //    console.log(result);
+          req.userId = result._id.toString();
+          next();
+          console.log(req.userId + "hello");
         }).catch(error =>{
             console.log(error);
         });
-        next();
+        }else{
+            console.log("working");
+            next();
+        }  
     }catch(error){
         res.status(401).json({
             message:'Auth Failed'
-        })
+        });
     }
 };

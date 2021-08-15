@@ -5,14 +5,15 @@ const crypto = require('crypto');
 const Vege = require('../models/vege');
 const Bucket = require('../models/bucket');
 const { ObjectId } = require("mongodb");
+// const totp = require('otplib');
 /****************Admin Auth ****************/
+
 exports.adminAuthentication = (req, res, next) => {
     // const admin = new Admin({
     //   email:"rajatchauha407@gmail.com",
     //   password:"e4b3cd7df927ee037044b83c097bd3573e7b4db1dcb39813da4f964e01d9581e"
     // });
     // admin.save();
-    
       const email = req.body.email;
       const password = req.body.password;
        console.log(req.res.locals.userId);

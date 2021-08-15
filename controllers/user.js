@@ -2,10 +2,17 @@ const User = require("../models/user");
 const Admin = require("../models/admin");
 const jwt = require("jsonwebtoken");
 const crypto = require('crypto');
-
+const {totp} = require('otplib');
+const Otp = require("../models/otp");
+const user = require("../models/user");
+const { truncate } = require("fs");
+// import {totp} from 'otplib';
 // creating the user and otp verification
-
 const generateOtp = (phoneNo) => {
+  // totp.options = {digits:4};
+  // const secret = totp.generateSecret({length:20});
+  // const token = totp.generate(secret);
+  console.log(phoneNo);
   const promise = new Promise((resolve, reject) => {
     var accountSid = process.env.AuthId;
     var authToken = process.env.AuthKey;
@@ -29,10 +36,8 @@ const generateOtp = (phoneNo) => {
   return promise;
 };
 
-
 /************Create User ***********/
-let OTP;
-let CONTACT;
+
 exports.createUser = (req, res, next) => {
   // console.log(req.body.contact);
   const contactNo = req.body.contact;
@@ -57,9 +62,8 @@ exports.createUser = (req, res, next) => {
       return token;
     }).then(result =>{
       res.status(201).json({
-        otp: OTP,
         token: result,
-        expiresIn: 3600*24,
+        expiresIn: 3600*24
       });
     })
     .catch((error) => {
@@ -89,25 +93,39 @@ exports.verifySignUp = (req,res, next) =>{
     })
   }
 };
-// Verifying User's Otp via user-login 
+// // Verifying User's Otp via user-login 
 exports.userVerify = (req, res, next) => {
   const otp = req.body.value;
-  const OrigOtp = OTP;
-  const contact = CONTACT;
-  const user = new User({
-    phoneNo : CONTACT
+  const salt = "getItSoon1995";
+  const userHash = crypto.createHmac("sha256",salt).update(otp).digest('hex');
+  Otp.findOne({otpHash:userHash}).then((result)=>{
+    console.log(result);
+    if(!result){
+      res.status(201).json({
+        message:"Invalid Otp",
+      })
+    }; 
+    if(result){
+      console.log(result);
+      console.log(result.expiresIn.getTime()+ (2*60*1000) > Date.now()?true:false);
+      if(result.otpHash == userHash && result.expiresIn.getTime()+(1000 * 24 * 3600)> Date.now() && result.used == false){
+        console.log("yes");
+        res.json({
+          message:"correct Otp",
+          result:true
+        });
+        Otp.deleteOne({otpHash:result.otpHash}).then(
+          (result)=>{
+            console.log(result);
+            console.log("Otp-deleted");
+          }
+        )
+      }
+      const exp = result.expiresIn.getTime() + 24*3600*1000;
+      console.log(new Date(exp));
+    }
   });
-  if (OrigOtp == otp) {
-    res.status(201).json({
-      result: true,
-    });
-  } else {
-    res.status(500).json({
-      message: "Otp Not Verified !"
-    })
-  }
 };
-
 
 /**************User Login Controller ********/
 exports.loginUser = (req, res, next) => {
@@ -119,8 +137,18 @@ exports.loginUser = (req, res, next) => {
       if (result) {
         console.log(result);
         generateOtp(contactNo).then((data) => {
-          const otpSent = data;
-          OTP = otpSent;
+          const otpSent = data.toString();
+          const date = Date.now();
+          // console.log(date);
+          const salt = "getItSoon1995";
+          const hash = crypto.createHmac("sha256",salt).update(otpSent).digest('hex');
+          const otp = new Otp({
+            otpHash:hash,
+            userId:result._id,
+            expiresIn:date+2000,
+            used:false,
+            contact:contactNo
+          });
           const token = jwt.sign(
             {
               contact: contactNo,
@@ -130,11 +158,12 @@ exports.loginUser = (req, res, next) => {
               expiresIn: "24h",
             }
           );
-          res.status(200).json({
-            otp: otpSent,
-            token: token,
-            expiresIn: 3600*24,
-            userId:result._id
+          otp.save().then((result)=>{
+            res.status(200).json({
+              token: token,
+              expiresIn: 3600*24,
+              userId:result._id
+            });
           });
         });
       } else {

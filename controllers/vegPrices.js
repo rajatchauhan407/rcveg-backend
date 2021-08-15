@@ -40,10 +40,13 @@ exports.prices = (req,res,next)=>{
 /******************Getting Prices and All products *******/
 exports.getPrices=(req,res,next)=>{  
     Vege.find().then(result =>{
-        console.log(req.res.locals.userId);
+        // console.log(req.userId + "hello2");
+            const userId = req.userId;
+        
+        // console.log(req.data);
             res.status(201).json({
               response:result,
-              userId: req.res.locals.userId
+              userId: userId
             });
         }).catch(error=>{
             console.log(error);
